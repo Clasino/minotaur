@@ -43,7 +43,7 @@ func succ (_ of: Term) -> Map
     return ["succ": of]
 }
 
-func toNat (_ n : Int) -> Term
+func toNat (_ n: Int) -> Term
 {
     var result : Term = zero
     for _ in 1...n
@@ -51,6 +51,20 @@ func toNat (_ n : Int) -> Term
         result = succ (result)
     }
     return result
+}
+
+func isNat (_ n: Term) -> Goal
+{
+    return (n === zero) ||
+        delayed(fresh
+            {
+                x in
+                (
+                    (n === succ(x)) &&
+                    isNat(x)
+                )
+            }
+        )
 }
 
 // rooms are numbered:
@@ -136,17 +150,79 @@ func minotaur (location: Term) -> Goal
     return location === room(3, 2)
 }
 
-// func path (from: Term, to: Term, through: Term) -> Goal
-// {
-//     // TODO
-// }
-//
-// func battery (through: Term, level: Term) -> Goal
-// {
-//     // TODO
-// }
-//
-// func winning (through: Term, level: Term) -> Goal
-// {
-//     // TODO
-// }
+func path (from: Term, to: Term, through: Term) -> Goal
+{
+    return ((from === to) && (through === List.cons(from, List.empty))) ||
+        delayed(fresh
+            {
+                first in fresh
+                {
+                    remainder in fresh
+                    {
+                        secondRemainder in
+                        (
+                            (through === List.cons(from, remainder)) &&
+                            (remainder === List.cons(first, secondRemainder)) &&
+                            doors(from: from, to: first) &&
+                            path(from: first, to: to, through: remainder)
+                        )
+                    }
+                }
+            }
+        )
+}
+
+func battery (through: Term, level: Term) -> Goal
+{
+    return ((through === List.empty) && isNat(level)) ||
+        delayed(fresh
+            {
+                path in fresh
+                {
+                    first in fresh
+                    {
+                        nat in
+                        (
+                            (through === List.cons(first, path)) &&
+                            (level === succ(nat)) &&
+                            battery(through: path, level: nat)
+                        )
+                    }
+                }
+            }
+        )
+}
+
+func minotaurInPath (through: Term) -> Goal
+{
+    return delayed(fresh
+        {
+            first in fresh
+            {
+                remainder in
+                (
+                    (through === List.cons(first, remainder)) &&
+                    (minotaur(location: first) || minotaurInPath(through: remainder))
+                )
+            }
+        }
+    )
+}
+
+func winning (through: Term, level: Term) -> Goal
+{
+    return battery(through: through, level: level) &&
+           minotaurInPath(through: through) &&
+           fresh
+           {
+               first in fresh
+               {
+                   last in
+                   (
+                       entrance(location: first) &&
+                       exit(location: last) &&
+                       path(from: first, to: last, through: through)
+                   )
+               }
+           }
+}

@@ -40,12 +40,13 @@ func resultsOf (goal: Goal, variables: [Variable]) -> [[Variable: Wrapper]]
 class minotaurTests: XCTestCase
 {
 
-    func testExample()
+    func testExemple()
     {
         print("\n ======================================== Test ======================================== \n")
 
         let r = Variable(named: "r")
         let s = Variable(named: "s")
+        let t = Variable(named: "t")
 
         for solution in solve (isRoom(location: r))
         {
@@ -80,6 +81,39 @@ class minotaurTests: XCTestCase
             print("* There is a Minotaur at \(solution[r])")
         }
 
+        print("")
+        var i : Int = -1
+        for solution in solve (path(from: r, to: s, through: t))
+        {
+            print("* There is a path form \(solution[r]) to \(solution[s]) through \(solution[t])")
+            i += 1
+        }
+        print("* There are \(i) paths")
+
+        print("")
+        for _ in solve (isNat(toNat(i)))
+        {
+            print("* \(i) is a natural number")
+        }
+
+        print("")
+        for solution in solve (path(from: room(4, 4), to: room(3, 2), through: t) && battery(through: t, level: toNat(7)))
+        {
+            print("* There is enough battery in the path form room(4, 4) to room(3, 2) through \(solution[t])")
+        }
+
+        print("")
+        for solution in solve (path(from: room(4, 4), to: room(3, 2), through: t) && minotaurInPath(through: t))
+        {
+            print("* There is a minotaur in the path form room(4, 4) to room(3, 2) through \(solution[t])")
+        }
+
+        print("")
+        for _ in solve (path(from: room(4, 4), to: room(4, 3), through: t) && winning(through: t, level: toNat(10)))
+        {
+            print("* You win")
+        }
+
         print("\n ======================================== Test ======================================== \n")
     }
 
@@ -112,48 +146,48 @@ class minotaurTests: XCTestCase
         XCTAssertEqual(resultsOf (goal: goal, variables: [location]).count, 1, "number of minotaurs is incorrect")
     }
 
-    // func testPath()
-    // {
-    //     let through = Variable (named: "through")
-    //     let goal    = path (from: room (4,4), to: room (3,2), through: through)
-    //     XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 2, "number of paths is incorrect")
-    // }
-    //
-    // func testBattery()
-    // {
-    //     let through = Variable (named: "through")
-    //     let goal    = path (from: room (4,4), to: room (3,2), through: through) &&
-    //                   battery (through: through, level: toNat (7))
-    //     XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 1, "number of paths is incorrect")
-    // }
-    //
-    // func testLosing()
-    // {
-    //     let through = Variable (named: "through")
-    //     let goal    = winning (through: through, level: toNat (6))
-    //     XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 0, "number of paths is incorrect")
-    // }
-    //
-    // func testWinning()
-    // {
-    //     let through = Variable (named: "through")
-    //     let goal    = winning (through: through, level: toNat (7))
-    //     XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 1, "number of paths is incorrect")
-    // }
+    func testPath()
+    {
+        let through = Variable (named: "through")
+        let goal    = path (from: room (4,4), to: room (3,2), through: through)
+        XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 2, "number of paths is incorrect")
+    }
+
+    func testBattery()
+    {
+        let through = Variable (named: "through")
+        let goal    = path (from: room (4,4), to: room (3,2), through: through) &&
+                      battery (through: through, level: toNat (7))
+        XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 1, "number of paths is incorrect")
+    }
+
+    func testLosing()
+    {
+        let through = Variable (named: "through")
+        let goal    = winning (through: through, level: toNat (6))
+        XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 0, "number of paths is incorrect")
+    }
+
+    func testWinning()
+    {
+        let through = Variable (named: "through")
+        let goal    = winning (through: through, level: toNat (7))
+        XCTAssertEqual(resultsOf (goal: goal, variables: [through]).count, 1, "number of paths is incorrect")
+    }
 
 
     static var allTests : [(String, (minotaurTests) -> () throws -> Void)]
     {
         return [
-            ("testExample", testExample),
+            ("testExemple", testExemple),
             ("testDoors", testDoors),
             ("testEntrance", testEntrance),
             ("testExit", testExit),
             ("testMinotaur", testMinotaur),
-            // ("testPath", testPath),
-            // ("testBattery", testBattery),
-            // ("testLosing", testLosing),
-            // ("testWinning", testWinning)
+            ("testPath", testPath),
+            ("testBattery", testBattery),
+            ("testLosing", testLosing),
+            ("testWinning", testWinning)
         ]
     }
 }
