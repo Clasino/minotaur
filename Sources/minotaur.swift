@@ -53,6 +53,7 @@ func toNat (_ n: Int) -> Term
     return result
 }
 
+// Check if n is a natural number
 func isNat (_ n: Term) -> Goal
 {
     return (n === zero) ||
@@ -76,26 +77,7 @@ func room (_ x: Int, _ y: Int) -> Term
     return Value (Position (x: x, y: y))
 }
 
-func isRoom (location: Term) -> Goal
-{
-    return (location === room(1, 1)) ||
-           (location === room(1, 2)) ||
-           (location === room(1, 3)) ||
-           (location === room(1, 4)) ||
-           (location === room(2, 1)) ||
-           (location === room(2, 2)) ||
-           (location === room(2, 3)) ||
-           (location === room(2, 4)) ||
-           (location === room(3, 1)) ||
-           (location === room(3, 2)) ||
-           (location === room(3, 3)) ||
-           (location === room(3, 4)) ||
-           (location === room(4, 1)) ||
-           (location === room(4, 2)) ||
-           (location === room(4, 3)) ||
-           (location === room(4, 4))
-}
-
+// Return all doors in the maze
 func doors (from: Term, to: Term) -> Goal
 {
     return ((from === room(1, 2)) && (to === room(1, 1))) ||
@@ -133,23 +115,27 @@ func doors (from: Term, to: Term) -> Goal
            ((from === room(4, 4)) && (to === room(3, 4)))
 }
 
+// Return all entrances in the maze
 func entrance (location: Term) -> Goal
 {
     return (location === room(1, 4)) ||
            (location === room(4, 4))
 }
 
+// Return all exits in the maze
 func exit (location: Term) -> Goal
 {
     return (location === room(1, 1)) ||
            (location === room(4, 3))
 }
 
+// Return the minotaur location in the maze
 func minotaur (location: Term) -> Goal
 {
     return location === room(3, 2)
 }
 
+// Return if the path is valid
 func path (from: Term, to: Term, through: Term) -> Goal
 {
     return ((from === to) && (through === List.cons(from, List.empty))) ||
@@ -172,6 +158,7 @@ func path (from: Term, to: Term, through: Term) -> Goal
         )
 }
 
+// Return if there is enough battery
 func battery (through: Term, level: Term) -> Goal
 {
     return ((through === List.empty) && isNat(level)) ||
@@ -193,6 +180,7 @@ func battery (through: Term, level: Term) -> Goal
         )
 }
 
+// Return if there is a minotaur in the path
 func minotaurInPath (through: Term) -> Goal
 {
     return delayed(fresh
@@ -209,6 +197,11 @@ func minotaurInPath (through: Term) -> Goal
     )
 }
 
+// Return if :  there is enough battery and
+//              there is a minotaur in the path and
+//              the first room is an entrance and
+//              the last room is an exit and
+//              the path is valid
 func winning (through: Term, level: Term) -> Goal
 {
     return battery(through: through, level: level) &&

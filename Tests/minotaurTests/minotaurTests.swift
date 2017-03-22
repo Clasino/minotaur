@@ -48,53 +48,37 @@ class minotaurTests: XCTestCase
         let s = Variable(named: "s")
         let t = Variable(named: "t")
 
-        for solution in solve (isRoom(location: r))
-        {
-            print("* There is a room \(solution[r])")
-        }
-
-        print("")
-
         for solution in solve (doors(from: r, to: s))
         {
             print("* There is a door from \(solution[r]) to \(solution[s])")
         }
 
         print("")
-
         for solution in solve (entrance(location: r))
         {
             print("* There is an entrance at \(solution[r])")
         }
 
         print("")
-
         for solution in solve (exit(location: r))
         {
             print("* There is an exit at \(solution[r])")
         }
 
         print("")
-
         for solution in solve (minotaur(location: r))
         {
             print("* There is a Minotaur at \(solution[r])")
         }
 
         print("")
-        var i : Int = -1
-        for solution in solve (path(from: r, to: s, through: t))
+        var i : Int = 0
+        for solution in solve (path(from: r, to: s, through: t) && entrance(location: r) && exit(location: s))
         {
             print("* There is a path form \(solution[r]) to \(solution[s]) through \(solution[t])")
             i += 1
         }
         print("* There are \(i) paths")
-
-        print("")
-        for _ in solve (isNat(toNat(i)))
-        {
-            print("* \(i) is a natural number")
-        }
 
         print("")
         for solution in solve (path(from: room(4, 4), to: room(3, 2), through: t) && battery(through: t, level: toNat(7)))
@@ -109,9 +93,9 @@ class minotaurTests: XCTestCase
         }
 
         print("")
-        for _ in solve (path(from: room(4, 4), to: room(4, 3), through: t) && winning(through: t, level: toNat(10)))
+        for solution in solve (path(from: r, to: s, through: t) && winning(through: t, level: toNat(7)))
         {
-            print("* You win")
+            print("* You win if you start from \(solution[r]) to \(solution[s]) through \(solution[t]) with 7 battery charges")
         }
 
         print("\n ======================================== Test ======================================== \n")
